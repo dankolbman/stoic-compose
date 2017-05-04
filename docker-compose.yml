@@ -1,0 +1,32 @@
+version: '3'
+services:
+  users:
+    build: https://github.com/dankolbman/stoic-users.git
+    environment:
+      - FLASK_CONFIG=production
+      - FLASK_DEBUG
+      - SECRET_KEY 
+      - SSL_DISABLE
+      - SQLALCHEMY_DATABASE_URI="postgres://postgres:5432/stoic"
+    command: ./manage.py runserver -h 0.0.0.0 -p 5000
+    ports:
+      - "5000:5000"
+    links:
+      - "pg:postgres"
+  geo:
+    build: https://github.com/dankolbman/stoic-geo.git
+    environment:
+      - FLASK_CONFIG=production
+      - FLASK_DEBUG
+      - SECRET_KEY 
+      - SSL_DISABLE
+      - CASSANDRA_HOSTS
+    command: ./manage.py runserver -h 0.0.0.0 -p 5001
+    ports:
+      - "5001:5001"
+    links:
+      - "cassandra:cassandra"
+  pg:
+    image: postgres:9.6
+  cassandra:
+    image: cassandra:3.10
