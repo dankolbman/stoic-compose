@@ -1,4 +1,4 @@
-Stoic
+![Stoic](docs/stoic_black.png)
 ========
 Master repo and composer for Stoic
 
