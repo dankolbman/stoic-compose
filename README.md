@@ -6,6 +6,18 @@ The (over)Architecture so far
 -----------------------------
 ![Architecture](docs/stoic.png)
 
+Goals
+-----
+
+Stoic was built with the intention of exploring microservice architecture
+design and management. The primay goal is to have highly encapsulated services
+that may be developed, tested, deployed, and scaled as needed.
+Another area of exploration is in continous deployment of the individual
+services. Each service is individually tested (unit tests + travis) and 
+containerized (docker) which is enough to have some continuous deployment,
+though perhaps not sufficient enough for real world use as it's still lacking
+functional and integration tests (TODO?).
+
 Running
 -------
 
