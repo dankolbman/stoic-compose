@@ -18,6 +18,28 @@ containerized (docker) which is enough to have some continuous deployment,
 though perhaps not sufficient enough for real world use as it's still lacking
 functional and integration tests (TODO?).
 
+Microservices
+-------------
+Here are the services so far:
+
+[![Build Status](https://travis-ci.org/dankolbman/stoic-trips.svg?branch=master)](https://travis-ci.org/dankolbman/stoic-geo)
+[![Coverage Status](https://coveralls.io/repos/github/dankolbman/stoic-trips/badge.svg)](https://coveralls.io/github/dankolbman/stoic-react)
+*React* - The front end map service in react
+
+[![Build Status](https://travis-ci.org/dankolbman/stoic-trips.svg?branch=master)](https://travis-ci.org/dankolbman/stoic-users)
+[![Coverage Status](https://coveralls.io/repos/github/dankolbman/stoic-trips/badge.svg)](https://coveralls.io/github/dankolbman/stoic-users)
+*Users* - User registration, account management, and authorization service
+
+[![Build Status](https://travis-ci.org/dankolbman/stoic-trips.svg?branch=master)](https://travis-ci.org/dankolbman/stoic-geo)
+[![Coverage Status](https://coveralls.io/repos/github/dankolbman/stoic-trips/badge.svg)](https://coveralls.io/github/dankolbman/stoic-geo)
+*Geo* - Geolocation services such as point collection, line creation for map
+traces, and trip analysis
+
+[![Build Status](https://travis-ci.org/dankolbman/stoic-trips.svg?branch=master)](https://travis-ci.org/dankolbman/stoic-trips)
+[![Coverage Status](https://coveralls.io/repos/github/dankolbman/stoic-trips/badge.svg)](https://coveralls.io/github/dankolbman/stoic-trips)
+*Trips* - Trip model and creation
+
+
 Running
 -------
 
