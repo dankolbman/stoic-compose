@@ -16,6 +16,9 @@ services:
     environment:
       - FLASK_CONFIG=production
       - FLASK_DEBUG
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - SECRET_KEY 
       - SSL_DISABLE
       - CASSANDRA_HOSTS=cassandra
@@ -24,9 +27,26 @@ services:
       - "redis"
     command: ["./wait-for-it.sh", "cassandra:9042", "--", "./manage.py", "runserver", "-h", "0.0.0.0", "-p", "5000"]
     restart: always
+    volumes:
+      - csv_files:/app/csv_files
     links:
       - "cassandra:cassandra"
       - "redis:redis"
+  trips:
+    build: https://github.com/dankolbman/stoic-trips.git
+    environment:
+      - FLASK_CONFIG=production
+      - FLASK_DEBUG
+      - SECRET_KEY 
+      - SSL_DISABLE
+      - SQLALCHEMY_DATABASE_URI=postgres://postgres:psql@postgres:5432/stoic
+    depends_on:
+      - "cassandra"
+      - "redis"
+    command: ./manage.py runserver -h 0.0.0.0 -p 5000
+    restart: always
+    links:
+      - "pg:postgres"
   nginx:
     image: nginx:1.13
     volumes:
@@ -37,21 +57,23 @@ services:
       - users
       - geo
   celery:
+    build: https://github.com/dankolbman/stoic-geo.git
     environment:
       - FLASK_CONFIG=production
       - FLASK_DEBUG
       - SECRET_KEY
       - SSL_DISABLE
       - CASSANDRA_HOSTS=cassandra
-      - CELERY_BROKER_URL='redis://redis:6379/0'
-      - CELERY_BACKEND='redis://redis:6379/0'
-      - CELERY_RESULT_BACKEND='redis://redis:6379/0'
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - CSV_UPLOAD_DIR=.
       - MAX_CONTENT_LENGTH=9999999999
-    build: https://github.com/dankolbman/stoic-geo.git
-    command: ["./wait-for-it.sh", "redis:6379", "--", "celery", "worker", "-l", "info", "-A", "geo.tasks.csv"]
+    command: ["./wait-for-it.sh", "redis:6379", "--", "celery", "worker", "-l", "debug", "-A", "geo.tasks"]
     depends_on:
       - "redis"
+    volumes:
+      - csv_files:/app/csv_files
     links:
       - "cassandra:cassandra"
       - "redis:redis"
@@ -73,4 +95,6 @@ volumes:
   pgdata:
     driver: local
   cassandradata:
+    driver: local
+  csv_files:
     driver: local
