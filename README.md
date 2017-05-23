@@ -39,6 +39,10 @@ traces, and trip analysis
 [![Coverage Status](https://coveralls.io/repos/github/dankolbman/stoic-trips/badge.svg)](https://coveralls.io/github/dankolbman/stoic-trips)
 *Trips* - Trip model and creation
 
+[![Build Status](https://travis-ci.org/dankolbman/stoic-images.svg?branch=master)](https://travis-ci.org/dankolbman/stoic-images)
+[![Coverage Status](https://coveralls.io/repos/github/dankolbman/stoic-images/badge.svg)](https://coveralls.io/github/dankolbman/stoic-images)
+*Images* - Image uploads and processing
+
 
 Running
 -------
