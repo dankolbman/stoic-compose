@@ -5,8 +5,8 @@ services:
     environment:
       - FLASK_CONFIG=production
       - FLASK_DEBUG
-      - SECRET_KEY 
       - SSL_DISABLE
+      - SECRET_KEY
       - SQLALCHEMY_DATABASE_URI=postgres://postgres:psql@postgres:5432/stoic
     command: ./manage.py runserver -h 0.0.0.0 -p 5000
     links:
@@ -16,24 +16,31 @@ services:
     environment:
       - FLASK_CONFIG=production
       - FLASK_DEBUG
-      - SECRET_KEY 
       - SSL_DISABLE
+      - SECRET_KEY
+      - GEO_URL=http://geo:5000
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_BACKEND=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
       - SQLALCHEMY_DATABASE_URI=postgres://postgres:psql@postgres:5432/stoic
+      - IMAGE_UPLOAD_DIR=/images
     command: ./manage.py runserver -h 0.0.0.0 -p 5000
     volumes:
-      - image_uploads:/uploads
+      - image_uploads:/images
     links:
       - "pg:postgres"
+      - "geo:geo"
+      - "redis"
   geo:
     build: https://github.com/dankolbman/stoic-geo.git
     environment:
       - FLASK_CONFIG=production
       - FLASK_DEBUG
+      - SSL_DISABLE
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_BACKEND=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - SECRET_KEY 
-      - SSL_DISABLE
+      - SECRET_KEY
       - CASSANDRA_HOSTS=cassandra
     depends_on:
       - "cassandra"
@@ -50,8 +57,8 @@ services:
     environment:
       - FLASK_CONFIG=production
       - FLASK_DEBUG
-      - SECRET_KEY 
       - SSL_DISABLE
+      - SECRET_KEY
       - SQLALCHEMY_DATABASE_URI=postgres://postgres:psql@postgres:5432/stoic
     depends_on:
       - "cassandra"
@@ -64,12 +71,13 @@ services:
     image: nginx:1.13
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - image_uploads:/images
     ports:
       - 8081:80
     links:
       - users
       - geo
-  celery:
+  celery_geo:
     build: https://github.com/dankolbman/stoic-geo.git
     environment:
       - FLASK_CONFIG=production
@@ -85,10 +93,34 @@ services:
     command: ["./wait-for-it.sh", "redis:6379", "--", "celery", "worker", "-l", "debug", "-A", "geo.tasks"]
     depends_on:
       - "redis"
+      - "geo"
     volumes:
       - csv_files:/app/csv_files
     links:
       - "cassandra:cassandra"
+      - "redis:redis"
+  celery_images:
+    build: https://github.com/dankolbman/stoic-images.git
+    environment:
+      - FLASK_CONFIG=production
+      - FLASK_DEBUG
+      - SECRET_KEY
+      - SSL_DISABLE
+      - GEO_URL=http://geo:5000
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_BACKEND=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - SQLALCHEMY_DATABASE_URI=postgres://postgres:psql@postgres:5432/stoic
+      - IMAGE_UPLOAD_DIR=/images
+    command: ["celery", "worker", "-l", "debug", "-A", "images.tasks"]
+    depends_on:
+      - "redis"
+      - "images"
+    volumes:
+      - image_uploads:/images
+    links:
+      - "geo:geo"
+      - "pg:postgres"
       - "redis:redis"
   pg:
     image: postgres:9.6
@@ -102,6 +134,8 @@ services:
     image: redis:3.2
   cassandra:
     image: cassandra:3.10
+    environment:
+      - CASSANDRA_START_RPC=true
     volumes:
       - cassandradata:/var/lib/cassandra
 volumes:
