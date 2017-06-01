@@ -11,6 +11,17 @@ services:
     command: ./manage.py runserver -h 0.0.0.0 -p 5000
     links:
       - "pg:postgres"
+  blog:
+    build: https://github.com/dankolbman/stoic-blog.git
+    environment:
+      - FLASK_CONFIG=production
+      - FLASK_DEBUG
+      - SSL_DISABLE
+      - SECRET_KEY
+      - SQLALCHEMY_DATABASE_URI=postgres://postgres:psql@postgres:5432/stoic
+    command: gunicorn -w 4 -b :5000 wsgi:app
+    links:
+      - "pg:postgres"
   images:
     build: https://github.com/dankolbman/stoic-images.git
     environment:
