@@ -1,7 +1,7 @@
 version: '3'
 services:
   users:
-    build: https://github.com/dankolbman/stoic-users.git
+    image: kolbman.xyz:3333/users
     environment:
       - FLASK_CONFIG=production
       - FLASK_DEBUG
@@ -12,7 +12,7 @@ services:
     links:
       - "pg:postgres"
   blog:
-    build: https://github.com/dankolbman/stoic-blog.git
+    image: kolbman.xyz:3333/blog
     environment:
       - FLASK_CONFIG=production
       - FLASK_DEBUG
@@ -23,7 +23,7 @@ services:
     links:
       - "pg:postgres"
   images:
-    build: https://github.com/dankolbman/stoic-images.git
+    image: kolbman.xyz:3333/images
     environment:
       - FLASK_CONFIG=production
       - FLASK_DEBUG
@@ -43,7 +43,7 @@ services:
       - "geo:geo"
       - "redis"
   geo:
-    build: https://github.com/dankolbman/stoic-geo.git
+    image: kolbman.xyz:3333/geo
     environment:
       - FLASK_CONFIG=production
       - FLASK_DEBUG
@@ -64,7 +64,7 @@ services:
       - "cassandra:cassandra"
       - "redis:redis"
   trips:
-    build: https://github.com/dankolbman/stoic-trips.git
+    image: kolbman.xyz:3333/trips
     environment:
       - FLASK_CONFIG=production
       - FLASK_DEBUG
@@ -89,7 +89,7 @@ services:
       - users
       - geo
   celery_geo:
-    build: https://github.com/dankolbman/stoic-geo.git
+    image: kolbman.xyz:3333/geo
     environment:
       - FLASK_CONFIG=production
       - FLASK_DEBUG
@@ -111,7 +111,7 @@ services:
       - "cassandra:cassandra"
       - "redis:redis"
   celery_images:
-    build: https://github.com/dankolbman/stoic-images.git
+    image: kolbman.xyz:3333/images
     environment:
       - FLASK_CONFIG=production
       - FLASK_DEBUG
